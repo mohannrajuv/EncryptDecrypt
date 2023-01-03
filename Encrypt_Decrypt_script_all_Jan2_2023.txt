@@ -1,0 +1,90 @@
+Decryption:
+----------
+
+USE [BellTeleCWT_Dev_18Nov2019]
+GO
+/****** Object:  UserDefinedFunction [dbo].[Decryption_Func]    Script Date: 1/3/2023 6:04:54 PM ******/
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+ALTER FUNCTION [dbo].[Decryption_Func](@key [nvarchar](256) = N'umlQxgrTYr6iFcO/DQmP1FPnKJg+uK+YNzenToL/O8E=', @plaintext [nvarchar](256))
+RETURNS [nvarchar](256) WITH EXECUTE AS CALLER
+AS 
+EXTERNAL NAME [Cryptographie].[Cryptographie.DecryptCLR].[DecryptString]
+
+
+
+Encryption:
+---------------
+USE [BellTeleCWT_Dev_18Nov2019]
+GO
+/****** Object:  UserDefinedFunction [dbo].[Encryption_Func]    Script Date: 1/3/2023 6:05:15 PM ******/
+SET ANSI_NULLS OFF
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+ALTER FUNCTION [dbo].[Encryption_Func](@key [nvarchar](256) = N'umlQxgrTYr6iFcO/DQmP1FPnKJg+uK+YNzenToL/O8E=', @plaintext [nvarchar](256))
+RETURNS [nvarchar](256) WITH EXECUTE AS CALLER
+AS 
+EXTERNAL NAME [Cryptographie].[Cryptographie.EncryptCLR].[EncryptString]
+
+
+-----------------
+Decryption func:
+-------------
+
+USE [BellTeleCWT_Dev_18Nov2019]
+GO
+/****** Object:  UserDefinedFunction [dbo].[Func_Decryption]    Script Date: 1/3/2023 6:06:33 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER FUNCTION
+[dbo].[Func_Decryption] (@encryptedtext nvarchar(max))
+returns nvarchar(max)
+WITH RETURNS NULL ON NULL INPUT
+BEGIN
+DECLARE @ResultVar nvarchar(max) = ''
+IF(LEN(ltrim(rtrim(@encryptedtext)))<1 )
+BEGIN
+select @ResultVar=@encryptedtext
+END
+else
+BEGIN
+SELECT @ResultVar=dbo.Decryption_Func(default,@encryptedtext)
+END
+RETURN @ResultVar
+END
+
+Encryption fun:
+--------------------
+
+USE [BellTeleCWT_Dev_18Nov2019]
+GO
+/****** Object:  UserDefinedFunction [dbo].[Func_Encryption]    Script Date: 1/3/2023 6:07:29 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER FUNCTION
+[dbo].[Func_Encryption] (@plaintext nvarchar(max))
+returns nvarchar(max)
+WITH RETURNS NULL ON NULL INPUT
+BEGIN
+DECLARE @ResultVar nvarchar(max) = ''
+IF(LEN(ltrim(rtrim(@plaintext)))<1 )
+BEGIN
+select @ResultVar=@plaintext
+END
+else
+BEGIN
+SELECT @ResultVar=dbo.Encryption_func(default,@plaintext)
+END
+RETURN @ResultVar
+END
+
+
